@@ -126,7 +126,7 @@ class StreamListener(tweepy.StreamListener):
 
     def on_status(self, status):
         if (time.time() - self.start_time) < self.limit:
-            print('processing incoming id:',status.id_str)
+            print('Processing incoming tweet id:',status.id_str)
             loop = asyncio.get_event_loop()
             tweetcontainer = []
             tweet_details = {}
@@ -272,20 +272,29 @@ class StreamListener(tweepy.StreamListener):
 
 def start_stream():
     while True:
-        try:
-            auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-            auth.set_access_token(access_key, access_secret)
-            streamer = tweepy.Stream(
-                auth=auth, listener=StreamListener(time_limit=runtime),tweet_mode='extended')
+        if (time.time() - start_time) < time_limit:
+            try:
+                auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+                auth.set_access_token(access_key, access_secret)
+                streamer = tweepy.Stream(
+                    auth=auth, listener=StreamListener(time_limit=runtime),tweet_mode='extended')
+                t = time.localtime()
+                current_time = time.strftime("%H:%M:%S", t)
+                print("Started tracking process for", runtime, "seconds at UTC time",current_time)
+                print("Tracking hashtags:", HASHTAGS)
+                streamer.filter(track=HASHTAGS)
+            except Exception as e:
+                print('Error in main():')
+                print(e.__doc__)
+        else:
             t = time.localtime()
             current_time = time.strftime("%H:%M:%S", t)
-            print("Started tracking process for", runtime, "seconds at UTC time",current_time)
-            print("Tracking hashtags:", HASHTAGS)
-            streamer.filter(track=HASHTAGS)
-        except Exception as e:
-            print('Error in main():')
-            print(e.__doc__)
+            print('Runtime limit of', time_limit, ' seconds reached, stopping connection at UTC time.',current_time)
+            sys.exit()
+            return False
 
 
 if __name__ == "__main__":
+    start_time = time.time()
+    time_limit=runtime
     start_stream()
