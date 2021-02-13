@@ -12,3 +12,5 @@ The application accepts the following environmental variables:
 - EVENTHUB_NAME: The event hub instance name.
 - RUNTIME_MINS: Set to an integer to indicate how many minutes the application will run. After the specified time is elapsed, the application will stop.
 - HASHTAGS: Insert a comma separated list of hashtags to track. DO NOT add the hash symbol ,the application will handle that by itself. Example: 'Hashtag1, Hashtag2, Hashtag3'
+
+A collection of sample tweets collected and processed by the application is contained in `data-output-sample.json`. 
